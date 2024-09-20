@@ -10,6 +10,7 @@ public class ApplePicker : MonoBehaviour
     public int              numBaskets      = 3;
     public float            basketBottomY   = -14f;
     public float            basketSpacingY  = 2f;
+    public bool             gameOver = false;
     public List<GameObject> basketList;
 
     // Start is called before the first frame update
@@ -29,6 +30,11 @@ public class ApplePicker : MonoBehaviour
 
     public void AppleMissed() {
         // Destroy all of the falling Apples
+
+        if (gameOver) {
+            return;
+        }
+
         GameObject[] appleArray=GameObject.FindGameObjectsWithTag("Apple");
         foreach ( GameObject tempGO in appleArray ) {
             Destroy( tempGO );
@@ -42,16 +48,37 @@ public class ApplePicker : MonoBehaviour
         // Remove the Basket from the list and destroy the GameObject
         basketList.RemoveAt( basketIndex );
         Destroy( basketGO );
+        // Increment Round Number
+        RoundTracker.INCREMENT_ROUND_COUNTER();
 
         // If there are no Baskets left, restart the game
+        /*
         if ( basketList.Count == 0 ) {
             SceneManager.LoadScene( "_Scene_0" );
         }
+        */
+        if ( basketList.Count == 0 ) {
+            RestartButton.showRestartButton();
+            gameOver = true;
+            //RestartButton.setActive(true);
+        }
+
+    }
+
+    public void BranchHit() {
+        foreach ( GameObject tempGO in basketList ) {
+            Destroy( tempGO );
+            RoundTracker.INCREMENT_ROUND_COUNTER();
+        }
+        RestartButton.showRestartButton();
+        gameOver = true;
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        
+    
+    public void restartLevel() {
+        RoundTracker.RESET_ROUND_COUNTER();
+        gameOver = false;
+        SceneManager.LoadScene( "_Scene_0" );
     }
 }
